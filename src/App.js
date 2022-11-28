@@ -1,33 +1,34 @@
+import React, { useState } from 'react';
 import './App.css';
-import React from 'react';
-import useInput from './components/form/useInput'
+import "bootstrap/dist/css/bootstrap.min.css"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import Login from "./components/Login/Login"
+import Dashboard from "./components/Dashboard/Dashboard"
+
+function setToken(userToken) {
+  sessionStorage.setItem('token', JSON.stringify(userToken));
+}
+
+function getToken() {
+  const tokenString = sessionStorage.getItem('token');
+  const userToken = JSON.parse(tokenString);
+  return userToken?.token
+}
 
 function App() {
-  const [usernameProps, resetUsername] = useInput("");
-  const [passwordProps, resetPassword] = useInput("")
+  const token = getToken();
 
-  const submit = (e) => {
-    e.preventDefault();
-    alert(`${usernameProps.value}, ${passwordProps.value}`)
-    resetUsername();
-    resetPassword();
+  if(!token) {
+    return <Login setToken={setToken} />
   }
+
   return (
-    <div className="App">
-      <h1>Hello Cats</h1>
-      <form onSubmit={submit}>
-        <input
-          {...usernameProps}
-          type="text"
-          placeholder="User Name"
-        />
-        <input
-          {...passwordProps}
-          type="text"
-          placeholder="Password"
-        />
-        <button>Log In</button>
-      </form>
+    <div className="wrapper">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
