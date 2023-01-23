@@ -1,11 +1,15 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
+import AuthContext from "../context/AuthProvider";
+import axios from '../api/axios';
+const LOGIN_URL = "api/v1/auth/login"
 
 const Login = () => {
+  const { setAuth } = useContext(AuthContext);
   const userRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState('');
-  const [pwd, setPwd] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [errMsg, setErrMsg] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -15,14 +19,40 @@ const Login = () => {
 
   useEffect(() => {
     setErrMsg('');
-  }, [user, pwd])
+  }, [username, password])
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user, pwd)
-    setUser('');
-    setPwd('');
-    setSuccess(true);
+
+    try {
+      const response = await axios.post(LOGIN_URL,
+        JSON.stringify({username, password}),
+        {
+          headers: { 'Content-Type': 'application/json'},
+          withCredentials: true,
+        }
+      );
+      console.log(JSON.stringify(response?.data));
+      const accessToken = response?.data?.accessToken;
+      // expects array of ints for roles, need to implement in Rails to uncomment
+      // const roles = response?.data?.roles;
+      // add roles to setAuth args when available
+      setAuth({ username, password, accessToken })
+      setUsername('');
+      setPassword('');
+      setSuccess(true);
+    } catch (err) {
+      if (!err?.response) {
+        setErrMsg('No Server Response')
+      } else if (err.response?.status === 400) {
+        setErrMsg('Missing Username or Password');
+      } else if (err.response?.status === 401) {
+        setErrMsg('Unauthorized');
+      } else {
+        setErrMsg('Login Failed');
+      }
+      err.Ref.current.focus();
+    }
   }
 
   return (
@@ -46,8 +76,8 @@ const Login = () => {
                       id="username"
                       ref={userRef}
                       autoComplete="off"
-                      onChange={(e) => setUser(e.target.value)}
-                      value={user}
+                      onChange={(e) => setUsername(e.target.value)}
+                      value={username}
                       required
                   />
 
@@ -55,8 +85,8 @@ const Login = () => {
                   <input
                       type="password"
                       id="password"
-                      onChange={(e) => setPwd(e.target.value)}
-                      value={pwd}
+                      onChange={(e) => setPassword(e.target.value)}
+                      value={password}
                       required
                   />
                   <button>Sign In</button>
@@ -69,8 +99,8 @@ const Login = () => {
                   </span>
               </p>
           </section>
-        )}    
-    </>  
+        )}
+    </>
   )
 }
 
