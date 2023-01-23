@@ -32,15 +32,11 @@ const Register = () => {
 
   useEffect(() => {
     const result = USER_REGEX.test(username);
-    console.log(result);
-    console.log(username);
     setValidName(result);
   }, [username])
 
   useEffect(() => {
     const result = PWD_REGEX.test(password);
-    console.log(result);
-    console.log(password);
     setValidPassword(result);
     const match = password === matchPassword;
     setValidMatch(match);
@@ -69,7 +65,7 @@ const Register = () => {
         }
     );
     console.log(response.data)
-    console.log(response.accessToken)
+
     setSuccess(true);
     // TODO: clear input fields
     } catch (err) {
