@@ -35,7 +35,7 @@ const Login = () => {
         JSON.stringify({username, password}),
         {
           headers: { 'Content-Type': 'application/json'},
-          withCredentials: true,
+          credentials: true,
         }
       );
       console.log(JSON.stringify(response?.data));
@@ -57,7 +57,7 @@ const Login = () => {
       } else {
         setErrMsg('Login Failed');
       }
-      err.Ref.current.focus();
+      errRef.current.focus();
     }
   }
 

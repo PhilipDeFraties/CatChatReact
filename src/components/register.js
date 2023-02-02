@@ -61,7 +61,7 @@ const Register = () => {
         JSON.stringify({user: { username, password }}),
         {
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true
+          credentials: true
         }
     );
     console.log(response.data)
